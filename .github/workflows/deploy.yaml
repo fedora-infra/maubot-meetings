@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: Contributors to the Fedora Project
+#
+# SPDX-License-Identifier: MIT
+
+name: Start a new build on openshift
+
+on: push
+
+jobs:
+  deployment:
+    name: Deployment
+    if: github.ref_name == 'staging' || github.ref_name == 'stable'
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name }}
+
+    steps:
+      - name: Send generic webhook
+        run: |
+          curl -f -X POST -k https://${{vars.OPENSHIFT_API_HOSTNAME}}:6443/apis/build.openshift.io/v1/namespaces/maubot/buildconfigs/maubot-build/webhooks/${{secrets.MAUBOT_WEBHOOK_SECRET}}/generic
